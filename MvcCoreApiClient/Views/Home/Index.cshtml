@@ -1,0 +1,264 @@
+﻿@{
+    ViewData["Title"] = "Persona Experience";
+}
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $("#btnpersonas").on("click", function () {
+                const $btn = $(this);
+                const originalContent = $btn.html();
+                const baseUrl = "https://apipersonasmpp-cvfzfcffhsa8hbb9.francecentral-01.azurewebsites.net/";
+                const request = "api/personas";
+
+                $("#errorPanel").addClass("d-none").text("");
+                $("#personas-container").html("");
+
+                $btn.prop("disabled", true);
+                $btn.html("<span class='spinner-border spinner-border-sm me-2' role='status' aria-hidden='true'></span>Loading...");
+
+                $.ajax({
+                    url: baseUrl + request,
+                    method: "GET",
+                    success: function (data) {
+                        let html = "";
+                        $.each(data, function (index, persona) {
+                            const nombre = persona.nombre ?? "Sin nombre";
+                            const email = persona.email ?? "Sin email";
+                            const edad = persona.edad ?? "-";
+                            const idPersona = persona.idPersona ?? "-";
+                            const inicial = nombre.charAt(0).toUpperCase();
+
+                            html += `
+                                <div class="col-12 col-md-6 col-xl-4">
+                                    <article class="persona-card reveal" style="animation-delay:${index * 80}ms;">
+                                        <header class="persona-header">
+                                            <div class="persona-avatar">${inicial}</div>
+                                            <div>
+                                                <h2 class="persona-name">${nombre}</h2>
+                                                <p class="persona-email">${email}</p>
+                                            </div>
+                                        </header>
+
+                                        <section class="persona-meta">
+                                            <div class="meta-box">
+                                                <span class="meta-label">ID</span>
+                                                <span class="meta-value">${idPersona}</span>
+                                            </div>
+                                            <div class="meta-box">
+                                                <span class="meta-label">Edad</span>
+                                                <span class="meta-value">${edad}</span>
+                                            </div>
+                                        </section>
+                                    </article>
+                                </div>
+                            `;
+                        });
+
+                        $("#personas-container").html(html);
+                    },
+                    error: function () {
+                        $("#errorPanel")
+                            .removeClass("d-none")
+                            .text("Could not load personas. Please try again.");
+                    },
+                    complete: function () {
+                        $btn.prop("disabled", false);
+                        $btn.html(originalContent);
+                    }
+                });
+            });
+        });
+    </script>
+}
+
+<style>
+    :root {
+        --bg-1: #0f172a;
+        --bg-2: #111827;
+        --bg-3: #1e293b;
+        --accent-1: #7c3aed;
+        --accent-2: #06b6d4;
+        --text-main: #e5e7eb;
+        --text-soft: #94a3b8;
+        --glass: rgba(255, 255, 255, 0.08);
+        --glass-border: rgba(255, 255, 255, 0.18);
+    }
+
+    .epic-shell {
+        position: relative;
+        isolation: isolate;
+        border-radius: 1.5rem;
+        overflow: hidden;
+        background: linear-gradient(130deg, var(--bg-1), var(--bg-2), var(--bg-3));
+        padding: 3rem 1.25rem;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+    }
+
+        .epic-shell::before {
+            content: "";
+            position: absolute;
+            inset: -30%;
+            z-index: -1;
+            background: radial-gradient(circle at 20% 20%, rgba(124, 58, 237, 0.35), transparent 35%), radial-gradient(circle at 80% 30%, rgba(6, 182, 212, 0.30), transparent 40%), radial-gradient(circle at 50% 80%, rgba(236, 72, 153, 0.25), transparent 35%);
+            filter: blur(10px);
+            animation: float-bg 12s ease-in-out infinite alternate;
+        }
+
+    @@keyframes float-bg {
+        from {
+            transform: translateY(-2%) scale(1.0);
+        }
+
+        to {
+            transform: translateY(2%) scale(1.06);
+        }
+    }
+
+    .hero-title {
+        color: #fff;
+        font-weight: 800;
+        letter-spacing: -0.03em;
+        margin-bottom: 0.35rem;
+    }
+
+    .hero-subtitle {
+        color: var(--text-soft);
+        margin-bottom: 1.75rem;
+    }
+
+    .btn-epic {
+        border: 0;
+        color: #fff;
+        background: linear-gradient(90deg, var(--accent-1), var(--accent-2));
+        border-radius: 999px;
+        padding: 0.85rem 1.4rem;
+        font-weight: 700;
+        box-shadow: 0 10px 25px rgba(124, 58, 237, 0.35);
+        transition: transform 180ms ease, box-shadow 180ms ease, opacity 180ms ease;
+    }
+
+        .btn-epic:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 14px 28px rgba(6, 182, 212, 0.35);
+            color: #fff;
+        }
+
+        .btn-epic:disabled {
+            opacity: 0.8;
+        }
+
+    .personas-grid {
+        margin-top: 1.5rem;
+        row-gap: 1rem;
+    }
+
+    .persona-card {
+        height: 100%;
+        border-radius: 1rem;
+        padding: 1rem;
+        color: var(--text-main);
+        background: var(--glass);
+        border: 1px solid var(--glass-border);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        transition: transform 220ms ease, border-color 220ms ease, box-shadow 220ms ease;
+    }
+
+        .persona-card:hover {
+            transform: translateY(-6px);
+            border-color: rgba(255, 255, 255, 0.35);
+            box-shadow: 0 14px 30px rgba(0, 0, 0, 0.25);
+        }
+
+    .persona-header {
+        display: flex;
+        align-items: center;
+        gap: 0.85rem;
+        margin-bottom: 1rem;
+    }
+
+    .persona-avatar {
+        width: 3rem;
+        height: 3rem;
+        border-radius: 999px;
+        display: grid;
+        place-items: center;
+        color: #fff;
+        font-weight: 800;
+        background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
+        box-shadow: 0 8px 18px rgba(6, 182, 212, 0.35);
+        flex-shrink: 0;
+    }
+
+    .persona-name {
+        margin: 0;
+        font-size: 1.1rem;
+        color: #fff;
+        line-height: 1.15;
+    }
+
+    .persona-email {
+        margin: 0.15rem 0 0;
+        color: var(--text-soft);
+        font-size: 0.9rem;
+        overflow-wrap: anywhere;
+    }
+
+    .persona-meta {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 0.65rem;
+    }
+
+    .meta-box {
+        border-radius: 0.75rem;
+        padding: 0.65rem 0.75rem;
+        background: rgba(2, 6, 23, 0.4);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .meta-label {
+        display: block;
+        color: var(--text-soft);
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-bottom: 0.2rem;
+    }
+
+    .meta-value {
+        color: #fff;
+        font-size: 1rem;
+        font-weight: 700;
+    }
+
+    .reveal {
+        opacity: 0;
+        transform: translateY(16px);
+        animation: reveal-up 420ms ease forwards;
+    }
+
+    @@keyframes reveal-up {
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+</style>
+
+<div class="container py-4 py-md-5">
+    <section class="epic-shell text-center">
+        <h1 class="display-5 hero-title">Welcome to the Persona Universe</h1>
+        <p class="hero-subtitle">A bold, immersive, and futuristic way to visualize your API data.</p>
+
+        <button id="btnpersonas" class="btn btn-epic" type="button">Load Personas</button>
+
+        <div id="errorPanel" class="alert alert-danger mt-4 d-none" role="alert"></div>
+
+        <div id="personas-container" class="row personas-grid justify-content-center"></div>
+    </section>
+</div>
+```
+
+Changed: full visual redesign (hero, animated background, glass cards, hover transitions, loading state, and error panel) while keeping your AJAX flow intact.
